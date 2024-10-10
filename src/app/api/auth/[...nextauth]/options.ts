@@ -8,18 +8,17 @@ import { prisma } from "@/lib/prisma";
 // const GITHUB_SECRET = process.env.GITHUB_SECRET || "";
 
 export const authOptions: NextAuthOptions = {
-  debug: true,
+  adapter: PrismaAdapter(prisma),
   session: {
     strategy: "database",
+    maxAge: 30 * 24 * 60 * 60,
+    updateAge: 24 * 60 * 60,
   },
-  adapter: PrismaAdapter(prisma),
   providers: [
     GithubProvider({
       clientId: process.env.GITHUB_ID as string,
       clientSecret: process.env.GITHUB_SECRET as string,
-      authorization: {
-        params: { scope: "read:user user:email" },
-      },
+      checks: ["none"],
     }),
     CredentialsProvider({
       name: "Credentials",
