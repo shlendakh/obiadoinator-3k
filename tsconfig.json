@@ -33,7 +33,7 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     "src/app/components/Navbar",
-    "src/app/api/user/create.js"
+    "src/**/*"
   ],
   "exclude": [
     "node_modules"
