@@ -3,6 +3,7 @@ import type { NextAuthOptions } from "next-auth";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { prisma } from "@/lib/prisma";
 import GoogleProvider from "next-auth/providers/google";
+// import FacebookProvider from "next-auth/providers/facebook";
 
 // Session configuration constants
 const SESSION_MAX_AGE = 30 * 24 * 60 * 60; // 30 days in seconds
@@ -63,6 +64,18 @@ export const authOptions: NextAuthOptions = {
         return process.env.GOOGLE_CLIENT_SECRET;
       })(),
     }),
+    // FacebookProvider({
+    //   clientId: (() => {
+    //     if (!process.env.FACEBOOK_CLIENT_ID)
+    //       throw new Error("Missing GOOGLE_CLIENT_ID environment variable");
+    //     return process.env.FACEBOOK_CLIENT_ID;
+    //   })(),
+    //   clientSecret: (() => {
+    //     if (!process.env.FACEBOOK_CLIENT_SECRET)
+    //       throw new Error("Missing GOOGLE_CLIENT_SECRET environment variable");
+    //     return process.env.FACEBOOK_CLIENT_SECRET;
+    //   })(),
+    // }),
   ],
 
   /**
