@@ -13,7 +13,13 @@ export default function Logo({ size, className }: LogoProps) {
   return (
     <div className={`${className}`}>
       <Link href="/">
-        <Image src={srcLogo} alt="Logo App" width={size} height={size} />
+        <Image
+          src={srcLogo}
+          alt="Logo App"
+          width={size}
+          height={size}
+          className="rounded-xl"
+        />
       </Link>
     </div>
   );
