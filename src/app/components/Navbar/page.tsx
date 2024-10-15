@@ -19,7 +19,7 @@ const links: Link[] = [
 
 export default function Navbar() {
   return (
-    <nav className="sticky top-0 z-10 flex items-center justify-between px-10 py-4 bg-red-200 drop-shadow-md">
+    <nav className="sticky top-0 z-10 flex items-center justify-between px-10 bg-slate-200 py-4 drop-shadow-md">
       <div className="flex-1">
         <Menu links={links} />
       </div>
