@@ -1,5 +1,5 @@
 import Menu from "./assets/Menu";
-import Profile from "./assets/Profile";
+import ProfileIcon from "./assets/ProfileIcon";
 import Logo from "./assets/Logo";
 
 const links: Link[] = [
@@ -27,7 +27,7 @@ export default function Navbar() {
         <Logo size={50} />
       </div>
       <div className="flex justify-end flex-1">
-        <Profile size={40} />
+        <ProfileIcon size={40} />
       </div>
     </nav>
   );

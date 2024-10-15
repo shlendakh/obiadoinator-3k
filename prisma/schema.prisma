@@ -1,25 +1,30 @@
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url      = env("DATABASE_URL") // Database connection URL from environment variables
 }
 
 generator client {
-  provider = "prisma-client-js"
+  provider = "prisma-client-js" // Specifies the Prisma Client generator
 }
 
 model User {
-  id            String          @id @default(cuid())
-  name          String?
-  email         String          @unique
-  emailVerified DateTime?
-  image         String?
-  accounts      Account[]
-  sessions      Session[]
+  id            String             @id @default(cuid()) // Unique identifier for the user, generated with cuid()
+  name          String? // Optional name of the user
+  email         String             @unique // Unique email address of the user
+  phone         String?            @unique // Optional unique phone number for the user
+  emailVerified DateTime? // Date and time when the email was verified
+  image         String? // Profile image stored as binary data
+  avatar        Bytes? // Added image to database
+  password      String? // Hashed password for email/password authentication
+  accounts      Account[] // List of associated accounts for authentication
+  sessions      Session[] // List of active sessions for the user
+  families      FamilyMember[] // Relation to families a user belongs to
+  invitations   FamilyInvitation[] // Invitations to join families
   // Optional for WebAuthn support
   Authenticator Authenticator[]
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now()) // Timestamp when the user was created
+  updatedAt DateTime @updatedAt // Timestamp when the user was last updated
 }
 
 model Account {
@@ -35,44 +40,102 @@ model Account {
   id_token          String?
   session_state     String?
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now()) // Timestamp when the account was created
+  updatedAt DateTime @updatedAt // Timestamp when the account was last updated
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade) // Relation to the User model
 
-  @@id([provider, providerAccountId])
+  @@id([provider, providerAccountId]) // Composite primary key to ensure uniqueness for each provider and account ID
 }
 
 model Session {
-  sessionToken String   @unique
-  userId       String
-  expires      DateTime
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sessionToken String   @unique // Unique session token
+  userId       String // ID of the user associated with the session
+  expires      DateTime // Expiration date of the session
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade) // Relation to the User model
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now()) // Timestamp when the session was created
+  updatedAt DateTime @updatedAt // Timestamp when the session was last updated
 }
 
 model VerificationToken {
-  identifier String
-  token      String
-  expires    DateTime
+  identifier String // Identifier for verification, such as email
+  token      String // Verification token
+  expires    DateTime // Expiration date of the token
 
-  @@id([identifier, token])
+  @@id([identifier, token]) // Composite primary key for uniqueness
 }
 
 // Optional for WebAuthn support
 model Authenticator {
-  credentialID         String  @unique
-  userId               String
-  providerAccountId    String
-  credentialPublicKey  String
-  counter              Int
-  credentialDeviceType String
-  credentialBackedUp   Boolean
-  transports           String?
+  credentialID         String  @unique // Unique identifier for the authenticator credential
+  userId               String // ID of the user associated with the authenticator
+  providerAccountId    String // ID of the provider account associated with the authenticator
+  credentialPublicKey  String // Public key for the authenticator
+  counter              Int // Counter used for tracking authenticator operations
+  credentialDeviceType String // Type of the authenticator device
+  credentialBackedUp   Boolean // Indicates whether the authenticator is backed up
+  transports           String? // Optional transports (e.g., USB, NFC)
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade) // Relation to the User model
 
-  @@id([userId, credentialID])
+  @@id([userId, credentialID]) // Composite primary key to ensure uniqueness
+}
+
+model Family {
+  id            String             @id @default(cuid()) // Unique identifier for the family, generated with cuid()
+  name          String // Name of the family
+  members       FamilyMember[] // Relation to members of the family
+  shoppingLists ShoppingList[] // Shopping lists owned by the family
+  invitations   FamilyInvitation[] // Invitations to join the family
+
+  createdAt DateTime @default(now()) // Timestamp when the family was created
+  updatedAt DateTime @updatedAt // Timestamp when the family was last updated
+}
+
+model FamilyMember {
+  id       String @id @default(cuid()) // Unique identifier for the family member, generated with cuid()
+  familyId String // ID of the family
+  userId   String // ID of the user
+  role     String // e.g., "owner", "member" // Role of the user in the family
+
+  family Family @relation(fields: [familyId], references: [id], onDelete: Cascade) // Relation to the Family model
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade) // Relation to the User model
+
+  @@unique([familyId, userId]) // Ensures a user can only be a member of a family once
+}
+
+model FamilyInvitation {
+  id       String @id @default(cuid()) // Unique identifier for the family invitation, generated with cuid()
+  familyId String // ID of the family
+  userId   String // ID of the user being invited
+  status   String @default("pending") // "pending", "accepted", "rejected" // Status of the invitation
+
+  family Family @relation(fields: [familyId], references: [id], onDelete: Cascade) // Relation to the Family model
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade) // Relation to the User model
+
+  createdAt DateTime @default(now()) // Timestamp when the invitation was created
+  updatedAt DateTime @updatedAt // Timestamp when the invitation was last updated
+}
+
+model ShoppingList {
+  id       String         @id @default(cuid()) // Unique identifier for the shopping list, generated with cuid()
+  familyId String // ID of the family that owns the shopping list
+  name     String // Name of the shopping list
+  items    ShoppingItem[] // List of items in the shopping list
+
+  family Family @relation(fields: [familyId], references: [id], onDelete: Cascade) // Relation to the Family model
+
+  createdAt DateTime @default(now()) // Timestamp when the shopping list was created
+  updatedAt DateTime @updatedAt // Timestamp when the shopping list was last updated
+}
+
+model ShoppingItem {
+  id                String  @id @default(cuid()) // Unique identifier for the shopping item, generated with cuid()
+  shoppingListId    String // ID of the shopping list the item belongs to
+  customProductName String? // Custom product name // Optional custom name for the product (e.g., if not in database)
+  quantity          Float // Quantity of the product to buy
+  isChecked         Boolean @default(false) // Whether the item is marked as bought
+
+  shoppingList ShoppingList @relation(fields: [shoppingListId], references: [id], onDelete: Cascade) // Relation to the ShoppingList model
 }
