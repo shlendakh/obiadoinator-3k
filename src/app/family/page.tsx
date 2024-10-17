@@ -3,6 +3,8 @@
 import { useEffect, useState, useCallback } from "react";
 import { getSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+
+// shadcn/ui components
 import {
   Card,
   CardContent,
@@ -11,7 +13,10 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Alert } from "@/components/ui/alert";
 
+// Components
 import CreatingFamilyForm from "./assets/CreatingFamilyForm";
 import ChangeFamilyForm from "./assets/ChangeFamilyForm";
 
@@ -30,12 +35,17 @@ enum FooterState {
 }
 
 export default function FamilySettingsPage() {
+  // Router
+  const router = useRouter();
+
+  // State
   const [familyInfo, setFamilyInfo] = useState<FamilyInfo | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [footerState, setFooterState] = useState<FooterState>(
     FooterState.Default
   );
-  const router = useRouter();
+  const [deleteConfirmation, setDeleteConfirmation] = useState<string>("");
+  const [deleteError, setDeleteError] = useState<string>("");
 
   const fetchFamilyInfo = useCallback(async () => {
     try {
@@ -82,6 +92,36 @@ export default function FamilySettingsPage() {
     setFooterState(FooterState.Default);
   };
 
+  const handleDeleteFamily = async () => {
+    if (deleteConfirmation === `DELETE ${familyInfo.family?.name}`) {
+      try {
+        const res = await fetch("/api/family/delete", {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            familyId: familyInfo.family?.id,
+          }),
+        });
+
+        if (!res.ok) {
+          throw new Error("Failed to delete family");
+        }
+
+        fetchFamilyInfo();
+        setFooterState(FooterState.Default);
+      } catch (error) {
+        console.error("Error deleting family", error);
+        setDeleteError("Failed to delete family. Please try again.");
+      }
+    } else {
+      setDeleteError(
+        "Delete confirmation does not match. Please type the correct phrase. Upper and lowercase matters"
+      );
+    }
+  };
+
   const renderFooterContent = () => {
     switch (footerState) {
       case FooterState.Default:
@@ -121,6 +161,33 @@ export default function FamilySettingsPage() {
         return <></>;
       case FooterState.CreateFamily:
         return <CreatingFamilyForm onSuccess={handleNameChangeSuccess} />;
+      case FooterState.DeleteFamily:
+        return (
+          <div className="flex flex-col gap-4 w-1/2">
+            <p>
+              To delete the family, type &quot;DELETE {familyInfo.family?.name}
+              &quot; below:
+            </p>
+            <Input
+              type="text"
+              value={deleteConfirmation}
+              onChange={(e) => {
+                setDeleteConfirmation(e.target.value);
+                setDeleteError("");
+              }}
+              placeholder={`DELETE ${familyInfo.family?.name}`}
+              className={deleteError ? "border-red-500" : ""}
+            />
+            {deleteError && <Alert variant="destructive">{deleteError}</Alert>}
+            <Button
+              onClick={handleDeleteFamily}
+              className="w-full"
+              variant="destructive"
+            >
+              Confirm Delete Family
+            </Button>
+          </div>
+        );
       case FooterState.NoFamily:
         return (
           <Button
