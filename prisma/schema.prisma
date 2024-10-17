@@ -121,7 +121,7 @@ model FamilyInvitation {
 model ShoppingList {
   id       String         @id @default(cuid()) // Unique identifier for the shopping list, generated with cuid()
   familyId String // ID of the family that owns the shopping list
-  name     String // Name of the shopping list
+  name     String         @default("Shopping List") // Name of the shopping list
   items    ShoppingItem[] // List of items in the shopping list
 
   family Family @relation(fields: [familyId], references: [id], onDelete: Cascade) // Relation to the Family model
@@ -131,11 +131,13 @@ model ShoppingList {
 }
 
 model ShoppingItem {
-  id                String  @id @default(cuid()) // Unique identifier for the shopping item, generated with cuid()
+  id                String   @id @default(cuid()) // Unique identifier for the shopping item, generated with cuid()
   shoppingListId    String // ID of the shopping list the item belongs to
   customProductName String? // Custom product name // Optional custom name for the product (e.g., if not in database)
   quantity          Float // Quantity of the product to buy
-  isChecked         Boolean @default(false) // Whether the item is marked as bought
+  unit              String   @default("") // Units
+  isChecked         Boolean  @default(false) // Whether the item is marked as bought
+  updatedAt         DateTime // Timestamp of last edit (for conflict handling)
 
   shoppingList ShoppingList @relation(fields: [shoppingListId], references: [id], onDelete: Cascade) // Relation to the ShoppingList model
 }
