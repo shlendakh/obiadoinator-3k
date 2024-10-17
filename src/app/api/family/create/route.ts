@@ -39,8 +39,16 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    // Create a shopping list for the newly created family
+    const shoppingList = await prisma.shoppingList.create({
+      data: {
+        familyId: family.id,
+        name: "Shopping List",
+      },
+    });
+
     // Confirm creating new family
-    return NextResponse.json(family, { status: 201 });
+    return NextResponse.json({ family, shoppingList }, { status: 201 });
     // asdasdasads
   } catch (error) {
     console.error(error);
