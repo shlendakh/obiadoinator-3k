@@ -109,7 +109,9 @@ type ShoppingItem = {
   id: string;
   shoppingListId: string;
   customProductName?: string | null;
-  quantity: number;
+  quantity?: number;
+  unit?: string;
   isChecked: boolean;
-  shoppingList?: ShoppingList;
+  shoppingList: ShoppingList;
+  categoryId?: string;
 };
