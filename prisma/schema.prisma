@@ -131,13 +131,23 @@ model ShoppingList {
 }
 
 model ShoppingItem {
-  id                String   @id @default(cuid()) // Unique identifier for the shopping item, generated with cuid()
+  id                String        @id @default(cuid()) // Unique identifier for the shopping item, generated with cuid()
   shoppingListId    String // ID of the shopping list the item belongs to
   customProductName String? // Custom product name // Optional custom name for the product (e.g., if not in database)
-  quantity          Float // Quantity of the product to buy
-  unit              String   @default("") // Units
-  isChecked         Boolean  @default(false) // Whether the item is marked as bought
+  quantity          Float? // Quantity of the product to buy
+  unit              String        @default("") // Units
+  isChecked         Boolean       @default(false) // Whether the item is marked as bought
   updatedAt         DateTime // Timestamp of last edit (for conflict handling)
+  categoryId        String? // ID of the category (optional)
+  category          ItemCategory? @relation(fields: [categoryId], references: [id]) // Relation to the ItemCategory model
 
   shoppingList ShoppingList @relation(fields: [shoppingListId], references: [id], onDelete: Cascade) // Relation to the ShoppingList model
+}
+
+model ItemCategory {
+  id           String @id @default(cuid()) // Unique identifier for the category, generated with cuid()
+  categoryName String // Name of the category
+  icon         Bytes? // Optional icon for the category
+
+  items ShoppingItem[] // Relation to ShoppingItem, one category can have many items
 }
