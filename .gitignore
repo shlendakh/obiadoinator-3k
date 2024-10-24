@@ -38,3 +38,5 @@ next-env.d.ts
 
 # quick dev's scripts
 quickTests.js
+
+.prettiercache
