@@ -40,3 +40,5 @@ next-env.d.ts
 quickTests.js
 
 .prettiercache
+
+/src/app/testing
