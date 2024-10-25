@@ -8,7 +8,10 @@ export async function GET() {
 
   // Return "unauthorized" if didn't catch session at all
   if (!session) {
-    return NextResponse.json({ message: "Uga buga" }, { status: 401 });
+    return NextResponse.json(
+      { message: "Nieautoryzowany dostęp" },
+      { status: 401 }
+    );
   }
 
   try {
