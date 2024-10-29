@@ -17,6 +17,13 @@ const links: Link[] = [
   },
 ];
 
+if (process.env.NODE_ENV === "development") {
+  links.push({
+    name: "Testing",
+    href: "/testing",
+  });
+}
+
 export default function Navbar() {
   return (
     <nav className="sticky top-0 z-10 flex items-center justify-between px-10 bg-slate-200 py-4 drop-shadow-md">
