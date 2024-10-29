@@ -12,7 +12,6 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    console.log("=====> Start");
     const userEmail = session.user?.email;
 
     // Return message if user email is missing from session
