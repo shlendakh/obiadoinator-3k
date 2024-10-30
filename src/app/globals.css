@@ -78,4 +78,9 @@
   body {
     @apply bg-background text-foreground;
   }
+  select:focus {
+    outline: none;
+    appearance: none; /* Standardowa właściwość */
+    -webkit-appearance: none; /* Właściwość specyficzna dla WebKit */
+  }
 }
