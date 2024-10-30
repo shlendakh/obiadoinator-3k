@@ -2,10 +2,14 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/options";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { ShoppingItem } from "./components/ShoppingItem/ShoppingItem";
-import { ItemCategory } from "@prisma/client";
+import { ShoppingItemRow } from "./components/ShoppingItemRow/ShoppingItemRow";
+import { ItemCategory, ShoppingList, ShoppingItem } from "@prisma/client";
 
-const baseUrl = process.env.NEXTAUTH_URL || "http://localhost:3000";
+import {
+  getShoppingListData,
+  getCategories,
+  getProductListData,
+} from "@/lib/functions";
 
 interface ShoppingListInfo {
   shoppingList?: ShoppingList;
@@ -15,48 +19,6 @@ interface ShoppingListInfo {
 interface ProductsListInfo {
   productsList?: ShoppingItem[];
   message?: string;
-}
-
-/**
- * Get shopping list info (for list id purpose and checking connection)
- *
- * @param {string} cookies Next-auth session token
- * @returns {ShoppingListInfo} JSON with info or message if error
- */
-async function getShoppingListData(cookie: string) {
-  const res = await fetch(`${baseUrl}/api/shopping/`, {
-    headers: { Cookie: cookie },
-  });
-  return res.json();
-}
-
-/**
- * Return array of categories with names and icons
- * @returns {ItemCategory[]} Array of categories
- */
-async function getCategories() {
-  const res = await fetch(`${baseUrl}/api/info/category`);
-  const data = await res.json();
-
-  return data.categoryList;
-}
-
-/**
- * Get all products from specific shopping list
- *
- * @param {string} cookie Next-auth session token
- * @param {string} shoppingListId Shopping list id
- * @returns {ProductsListInfo} JSON with info or message if error
- */
-async function getProductListData(cookie: string, shoppingListId: string) {
-  const res = await fetch(
-    `${baseUrl}/api/shopping/products-list?shoppingListId=${shoppingListId}`,
-    {
-      headers: { Cookie: cookie },
-      cache: "no-cache",
-    }
-  );
-  return res.json();
 }
 
 export default async function Page() {
@@ -124,7 +86,7 @@ export default async function Page() {
       {products?.length ? (
         <div className="flex flex-col items-center justify-center gap-2">
           {products.map((item) => (
-            <ShoppingItem
+            <ShoppingItemRow
               key={item.id}
               params={item}
               categoryList={categories}
