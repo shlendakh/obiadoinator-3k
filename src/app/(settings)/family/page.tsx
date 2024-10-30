@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { getSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { Family } from "@prisma/client";
 
 // shadcn/ui components
 import {
@@ -201,7 +202,7 @@ export default function FamilySettingsPage() {
   };
 
   return (
-    <Card className="mx-auto my-4 w-1/2">
+    <Card className="mx-auto my-4 md:w-1/2 w-11/12">
       <CardHeader>
         <CardTitle>Family Settings</CardTitle>
       </CardHeader>

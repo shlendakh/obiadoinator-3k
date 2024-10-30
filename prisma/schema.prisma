@@ -133,9 +133,9 @@ model ShoppingList {
 model ShoppingItem {
   id                String        @id @default(cuid()) // Unique identifier for the shopping item, generated with cuid()
   shoppingListId    String // ID of the shopping list the item belongs to
-  customProductName String? // Custom product name // Optional custom name for the product (e.g., if not in database)
+  customProductName String // Custom product name // Optional custom name for the product (e.g., if not in database)
   quantity          Float? // Quantity of the product to buy
-  unit              String        @default("") // Units
+  unit              String?       @default("") // Units
   isChecked         Boolean       @default(false) // Whether the item is marked as bought
   updatedAt         DateTime // Timestamp of last edit (for conflict handling)
   categoryId        String? // ID of the category (optional)
